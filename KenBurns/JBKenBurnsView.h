@@ -27,6 +27,7 @@
 #import <QuartzCore/QuartzCore.h>
 
 @class JBKenBurnsView;
+@class SDImageCache;
 @protocol KenBurnsViewDelegate <NSObject>
 
 @optional
@@ -80,6 +81,23 @@ NS_ENUM(NSInteger, JBZoomMode) {
              initialDelay:(float)delay
                      loop:(BOOL)isLoop
               isLandscape:(BOOL)isLandscape;
+
+
+/**
+ Start the animation with a NSArray of UIImages.
+ @param cacheKeys   A NSArray of cacheKeys (SDWebImage).
+ @param imageCache  SDImageCache
+ @param time        The number of second of each image.
+ @param isLoop      YES if you want to play the animation in loop.
+ @param isLandscape YES if the view is in landscape mode.
+ @since 0.3
+ */
+- (void)animateWithCacheKeys:(NSArray *)cacheKeys
+                  imageCache:(SDImageCache*)imageCache
+          transitionDuration:(float)time
+                initialDelay:(float)delay
+                        loop:(BOOL)isLoop
+                 isLandscape:(BOOL)isLandscape;
 
 
 ///----------------------------------

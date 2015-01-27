@@ -23,13 +23,15 @@
 //
 
 #import "JBKenBurnsView.h"
+#import "SDImageCache.h"
 
 #define enlargeRatio 1.1
 #define imageBufer 3
 
 enum JBSourceMode {
     JBSourceModeImages,
-    JBSourceModePaths
+    JBSourceModePaths,
+    JBSourceModeCache,
 };
 
 // Private interface
@@ -37,6 +39,7 @@ enum JBSourceMode {
 
 @property (nonatomic, strong) NSMutableArray *imagesArray;
 @property (nonatomic, strong) NSTimer *nextImageTimer;
+@property (nonatomic, strong) SDImageCache* imageCache;
 
 @property (nonatomic, assign) CGFloat showImageDuration;
 @property (nonatomic, assign) BOOL shouldLoop;
@@ -74,12 +77,21 @@ enum JBSourceMode {
 - (void)animateWithImagePaths:(NSArray *)imagePaths transitionDuration:(float)duration initialDelay:(float)delay loop:(BOOL)shouldLoop isLandscape:(BOOL)isLandscape
 {
     _sourceMode = JBSourceModePaths;
+    _imageCache = nil;
     [self startAnimationsWithData:imagePaths transitionDuration:duration initialDelay:delay loop:shouldLoop isLandscape:isLandscape];
 }
 
 - (void)animateWithImages:(NSArray *)images transitionDuration:(float)duration initialDelay:(float)delay loop:(BOOL)shouldLoop isLandscape:(BOOL)isLandscape {
     _sourceMode = JBSourceModeImages;
+    _imageCache = nil;
     [self startAnimationsWithData:images transitionDuration:duration initialDelay:delay loop:shouldLoop isLandscape:isLandscape];
+}
+
+- (void)animateWithCacheKeys:(NSArray *)cacheKeys imageCache:(SDImageCache*)imageCache transitionDuration:(float)duration initialDelay:(float)delay loop:(BOOL)shouldLoop isLandscape:(BOOL)isLandscape;
+{
+    _sourceMode = JBSourceModeCache;
+    _imageCache = imageCache;
+    [self startAnimationsWithData:cacheKeys transitionDuration:duration initialDelay:delay loop:shouldLoop isLandscape:isLandscape];
 }
 
 - (void)startAnimationsWithData:(NSArray *)data transitionDuration:(float)duration initialDelay:(float)delay loop:(BOOL)shouldLoop isLandscape:(BOOL)isLandscape
@@ -135,6 +147,9 @@ enum JBSourceMode {
             
         case JBSourceModePaths:
             image = [UIImage imageWithContentsOfFile:imageInfo];
+            
+        case JBSourceModeCache:
+            image = [_imageCache imageFromDiskCacheForKey:imageInfo];
             break;
     }
     
